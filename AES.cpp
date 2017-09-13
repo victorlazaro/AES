@@ -2,11 +2,6 @@
 // Created by Victor Lazaro on 9/8/17.
 //
 
-#include <cstdlib>
-#include <printf.h>
-#include <iostream>
-#include <utility>
-#include <vector>
 #include "AES.h"
 
 AES::AES() = default;
@@ -51,6 +46,7 @@ void AES::subBytes() {
 }
 
 void AES::shiftRows() {
+    
     vector<vector<byte>> transposed = transpose(state);
 
     for (auto i = 1; i < 4; i++)

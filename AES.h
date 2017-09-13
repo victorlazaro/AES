@@ -7,23 +7,19 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <printf.h>
+#include <iostream>
 
 #define Nb 4
-#define firstByteMask 0xff000000
-#define secondByteMask 0x00ff0000
-#define thirdByteMask 0x0000ff00
-#define fourthByteMask 0x000000ff
-
 
 typedef unsigned char byte;
-typedef unsigned int word;
 
 using namespace std;
 
 class AES {
 
 private:
-
 
     void addRoundKey(int startIndex);
 
@@ -52,6 +48,12 @@ private:
     vector<byte> wordXor(vector<byte>& word, vector<byte>& temp);
 
     void printMatrix(vector<vector<byte>> matrix);
+
+    vector<vector<byte>> keySchedule(vector<vector<byte>> key, int wordCount, int nk);
+
+    vector<vector<byte>> transpose(vector<vector<byte>> v);
+
+    void invRotWord(vector<byte> &row);
 
     byte s[16][16] =
     {
@@ -104,21 +106,19 @@ private:
             0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61,
             0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
             };
+
     vector<vector<byte>> state;
+
     vector<vector<byte>> expandedKey;
-    vector<vector<byte>> keySchedule(vector<vector<byte>> key, int wordCount, int nk);
-
-    vector<vector<byte>> transpose(vector<vector<byte>> v);
-
 public:
+
     AES();
 
     const vector<vector<byte>> &getState() const;
 
     void cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
-    void invCypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
 
-    void invRotWord(vector<byte> &row);
+    void invCypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
 };
 
 

@@ -1,11 +1,5 @@
 #include <iostream>
-#include <sstream>
-#include <iomanip>
 #include "AES.h"
-
-using namespace std;
-typedef unsigned char byte;
-
 
 vector<vector<byte>> input {vector<byte> {0x00, 0x11, 0x22, 0x33},
                              vector<byte> {0x44, 0x55, 0x66, 0x77},
