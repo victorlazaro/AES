@@ -70,20 +70,22 @@ void AES::mixColumns() {
 
 
     vector<vector<byte>> newState = state;
-
+    vector<vector<byte>> transposed = transpose(state);
 
     for (auto i = 0; i < 4; i++) // fixed rows
     {
         for (auto j = 0; j < 4; j++) // state columns
         {
+            byte val = 0x00;
             for (auto k = 0; k < 4; k++) // state rows
             {
-                newState[i][j] = ffAdd(ffMultiply(fixed[i][k], state[k][j]), newState[i][j]);
-                printf("%.2x\n", newState[i][j]);
+                byte mult = ffMultiply(transposed[k][j], fixed[i][k]);
+                val = ffAdd(mult, val);
             }
+            newState[i][j] = val;
         }
     }
-    state = newState;
+    state = transpose(newState);
 }
 
 byte AES::ffAdd(byte a, byte b) {
@@ -137,27 +139,28 @@ void AES::cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int 
 
 //    printMatrix(input);
     state = input;
-    printMatrix(state);
+    printMatrix(transpose(state));
     int wordCount = Nb * (nr + 1);
     expandedKey = keySchedule(inputKey, wordCount, nk);
     addRoundKey(0);
-    printMatrix(state);
+    printMatrix(transpose(state));
     for (int i = 1; i < nr; i++)
     {
         subBytes();
-        printMatrix(state);
+        printMatrix(transpose(state));
         shiftRows();
-        printMatrix(state);
-//        mixColumns();
-//        printStateMatrix();
-//        addRoundKey(i * 4);
-//        printStateMatrix();
+        printMatrix(transpose(state));
+        mixColumns();
+        printMatrix(transpose(state));
+        addRoundKey(i * 4);
+        printMatrix(transpose(state));
     }
-//
-//    subBytes();
-//    shiftRows();
-//    printStateMatrix();
-//    addRoundKey(40);
+
+    subBytes();
+    shiftRows();
+    printMatrix(transpose(state));
+    addRoundKey(wordCount - 4);
+    printMatrix(transpose(state));
 
 
 }
@@ -173,45 +176,6 @@ void AES::invShiftRows() {
 
 void AES::invMixColumns() {
 
-}
-
-vector<vector<byte>> AES::keySchedule(byte** key, int wordCount, int nk) {
-    vector<vector<byte>> keys;
-
-    for (auto i = 0; i < 4; i++)
-    {
-        vector<byte> temp;
-        keys.push_back(temp);
-        for (auto j = 0; j < 4; j++)
-        {
-            keys[i].push_back(key[j][i]);
-        }
-
-    }
-
-    int i = nk;
-
-    vector<byte> temp;
-    byte constant = 0x01;
-    while (i < wordCount)
-    {
-        temp = keys[i-1];
-        if (i % nk == 0)
-        {
-            rotWord(temp);
-            subWord(temp);
-            vector<byte> roundConstant {constant, 0x00, 0x00, 0x00};
-            temp = wordXor(temp, roundConstant);
-            constant = ffMultiply(constant, 2);
-        }
-        else if (nk > 6 && i % nk == 4)
-        {
-            subWord(temp);
-        }
-        keys.push_back(wordXor(keys[i-nk], temp));
-        i++;
-    }
-    return keys;
 }
 
 void AES::rotWord(vector<byte>& word) {

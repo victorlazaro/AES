@@ -73,10 +73,10 @@ private:
             0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
             };
 
-    byte fixed[4][4] = { 02, 03, 01, 01,
-                         01, 02, 03, 01,
-                         01, 01, 02, 03,
-                         03, 01, 01, 02
+    vector<vector<byte>> fixed = {  vector<byte> {02, 03, 01, 01},
+                                    vector<byte> {01, 02, 03, 01},
+                                    vector<byte> {01, 01, 02, 03},
+                                    vector<byte> {03, 01, 01, 02}
 
     };
     byte inv_s[16][16] =
@@ -100,15 +100,12 @@ private:
             };
     vector<vector<byte>> state;
     vector<vector<byte>> expandedKey;
-    vector<vector<byte>> keySchedule(byte** key, int wordCount, int nk);
     vector<vector<byte>> keySchedule(vector<vector<byte>> key, int wordCount, int nk);
 
     vector<vector<byte>> transpose(vector<vector<byte>> v);
 
 public:
     AES();
-
-    void cypher(byte input[16], byte inputKey[16], int nk, int nr);
 
     void cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
 };
