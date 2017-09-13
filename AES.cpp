@@ -2,6 +2,7 @@
 // Created by Victor Lazaro on 9/8/17.
 //
 
+#include <sstream>
 #include "AES.h"
 
 AES::AES() = default;
@@ -46,7 +47,7 @@ void AES::subBytes() {
 }
 
 void AES::shiftRows() {
-    
+
     vector<vector<byte>> transposed = transpose(state);
 
     for (auto i = 1; i < 4; i++)
@@ -58,7 +59,6 @@ void AES::shiftRows() {
     }
     state = transpose(transposed);
 }
-
 
 void AES::mixColumns(const vector<vector<byte>>& fixedMatrix) {
 
@@ -120,7 +120,6 @@ byte AES::ffMultiply(byte a, byte b) {
 
 }
 
-
 void AES::subWord(vector<byte>& word) {
 
     for (int i = 0; i < 4; i++)
@@ -130,59 +129,63 @@ void AES::subWord(vector<byte>& word) {
 
 void AES::cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr) {
 
+    int round = 0;
     state = std::move(input);
-    printMatrix(transpose(state));
+    printVal(round, "input", state);
     int wordCount = Nb * (nr + 1);
     expandedKey = keySchedule(std::move(inputKey), wordCount, nk);
+    printVal(round, "k_sch", getCurrKey(0));
     addRoundKey(0);
-    printMatrix(transpose(state));
-    for (int i = 1; i < nr; i++)
+    for (round = 1; round < nr; round++)
     {
+        printVal(round, "start", state);
         subBytes();
-        printMatrix(transpose(state));
+        printVal(round, "s_box", state);
         shiftRows();
-        printMatrix(transpose(state));
+        printVal(round, "s_row", state);
         mixColumns(fixed);
-        printMatrix(transpose(state));
-        addRoundKey(i * 4);
-        printMatrix(transpose(state));
+        printVal(round, "m_col", state);
+        printVal(round, "k_sch", getCurrKey(round * 4));
+        addRoundKey(round * 4);
     }
 
     subBytes();
+    printVal(round, "s_box", state);
     shiftRows();
-    printMatrix(transpose(state));
+    printVal(round, "s_row", state);
+    printVal(round, "k_sch", getCurrKey(round * 4));
     addRoundKey(wordCount - 4);
-    printMatrix(transpose(state));
+    printVal(round, "output", state);
 }
 
 void AES::invCypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr) {
 
+    int round = nr;
     state = std::move(input);
-    printMatrix(transpose(state));
+    printVal(nr - round, "iinput", state);
     int wordCount = Nb * (nr + 1);
+    printVal(nr - round, "ik_sch", getCurrKey(round * 4));
     expandedKey = keySchedule(std::move(inputKey), wordCount, nk);
     addRoundKey(nr * Nb);
-    printMatrix(transpose(state));
-    for (int i = nr - 1; i >= 1 ; i--)
+    for (round = nr - 1; round >= 1 ; round--)
     {
+        printVal(nr - round, "istart", state);
         invShiftRows();
-        printMatrix(transpose(state));
+        printVal(nr - round, "is_row", state);
         invSubBytes();
-        printMatrix(transpose(state));
-        addRoundKey(i * Nb);
-        printMatrix(transpose(state));
+        printVal(nr - round, "is_box", state);
+        addRoundKey(round * Nb);
+        printVal(nr - round, "ik_sch", getCurrKey(round * Nb));
         invMixColumns();
-        printMatrix(transpose(state));
     }
 
     invShiftRows();
-    printMatrix(transpose(state));
+    printVal(nr - round, "is_row", state);
     invSubBytes();
-    printMatrix(transpose(state));
+    printVal(nr - round, "is_box", state);
     addRoundKey(0);
-    printMatrix(transpose(state));
+    printVal(0, "ioutput", state);
 }
-
 
 void AES::invSubBytes() {
 
@@ -285,4 +288,36 @@ void AES::invRotWord(vector<byte> &row) {
 
 const vector<vector<byte>> &AES::getState() const {
     return state;
+}
+
+void AES::printVal(int round, string step, vector<vector<byte>> state) {
+
+    cout << "round[ " + to_string(round) + "]." + step + "\t";
+
+    string stateStr;
+    for (int i = 0; i < state.size(); i++)
+    {
+        for (int j = 0; j < state[i].size(); j++)
+        {
+            printf("%.2x", state[i][j]);
+        }
+    }
+    cout << "\n";
+}
+
+vector<vector<byte>> AES::getCurrKey(int startIndex) {
+
+    vector<vector<byte>> key = {{0,0,0,0},
+                                {0,0,0,0},
+                                {0,0,0,0},
+                                {0,0,0,0}};
+
+    for (auto i = 0; i < 4; i++)
+    {
+        for (auto j = 0; j < 4; j++)
+        {
+            key[i][j] = expandedKey[i + startIndex][j];
+        }
+    }
+    return key;
 }

@@ -40,12 +40,12 @@ int main() {
 
     AES aes = AES();
 //    aes.cypher(test, testKey, 4, 10);
-//    aes.cypher(input, key128, 4, 10);
-//    aes.invCypher(aes.getState(), key128, 4, 10);
+    aes.cypher(input, key128, 4, 10);
+    aes.invCypher(aes.getState(), key128, 4, 10);
     aes.cypher(input, key192, 6, 12);
     aes.invCypher(aes.getState(), key192, 6, 12);
-//    aes.cypher(input, key256, 8, 14);
-//    aes.invCypher(aes.getState(), key256, 8, 14);
+    aes.cypher(input, key256, 8, 14);
+    aes.invCypher(aes.getState(), key256, 8, 14);
 
     return 0;
 }

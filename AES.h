@@ -119,6 +119,10 @@ public:
     void cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
 
     void invCypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
+
+    void printVal(int round, string step, vector<vector<byte>> state);
+
+    vector<vector<byte>> getCurrKey(int startIndex);
 };
 
 
