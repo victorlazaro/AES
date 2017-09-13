@@ -31,7 +31,7 @@ private:
 
     void shiftRows();
 
-    void mixColumns();
+    void mixColumns(const vector<vector<byte>>& fixedMatrix);
 
     void invSubBytes();
 
@@ -79,6 +79,12 @@ private:
                                     vector<byte> {03, 01, 01, 02}
 
     };
+    vector<vector<byte>> invFixed = {   vector<byte> {0x0e, 0x0b, 0x0d, 0x09},
+                                        vector<byte> {0x09, 0x0e, 0x0b, 0x0d},
+                                        vector<byte> {0x0d, 0x09, 0x0e, 0x0b},
+                                        vector<byte> {0x0b, 0x0d, 0x09, 0x0e}
+
+    };
     byte inv_s[16][16] =
     {
             0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
@@ -107,7 +113,12 @@ private:
 public:
     AES();
 
+    const vector<vector<byte>> &getState() const;
+
     void cypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
+    void invCypher(vector<vector<byte>> input, vector<vector<byte>> inputKey, int nk, int nr);
+
+    void invRotWord(vector<byte> &row);
 };
 
 
